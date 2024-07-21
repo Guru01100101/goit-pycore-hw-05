@@ -24,7 +24,18 @@ def parse_log_line(line: str, log_pattern: Pattern[str] = log_format_pattern) ->
 
 
 def load_logs(logfile_path: str) -> list:
-    ...
+    """
+    Loads log lines from a file, parses them, and returns a list of log dictionaries
+    :arg logfile_path: path to the log file
+    :return: list of log dictionaries with the timestamp, level, and message
+    :err return: empty list if the file does not exist
+    """
+
+    if not Path(logfile_path).is_file() or not Path(logfile_path).exists():
+        return []
+
+    with open(logfile_path, 'r') as file:
+        return [parse_log_line(line) for line in file]
 
 
 def filter_logs_by_level(logs: list, log_level: str) -> list:
