@@ -1,4 +1,5 @@
 import re
+import argparse
 from collections import defaultdict
 from datetime import datetime
 from typing import List, Dict, Pattern
@@ -79,9 +80,30 @@ def display_log_counts(counts: dict):
         print(f"{level:<15} | {count:>10}")
 
 
-if __name__ == '__main__':
-    logs = load_logs('log.log')
+def main(logfile_path: str, log_level: str = None):
+    logs = load_logs(logfile_path)
     if not logs:
         print('Log file not found or empty')
     else:
         display_log_counts(count_logs_by_level(logs))
+        if log_level:
+            filtered_logs = filter_logs_by_level(logs, log_level)
+            for log in filtered_logs:
+                print(f"{log['timestamp']} | {log['level']} | {log['message']}")
+
+
+if __name__ == '__main__':
+    # Parse arguments from the command line
+    parser = argparse.ArgumentParser(description='Parse and display log file')
+    parser.add_argument('logfile',
+                        type=str,
+                        help='Path to the log file')
+    parser.add_argument('--level',
+                        type=str,
+                        help='Filter logs by level',
+                        default=None,
+                        choices=['INFO', 'ERROR', 'DEBUG'],
+                        dest='log_level')
+    args = parser.parse_args()
+    main(args.logfile,
+         log_level=args.log_level)
