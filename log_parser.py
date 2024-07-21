@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from typing import List, Dict, Pattern
 from pathlib import Path
 
@@ -8,7 +9,7 @@ log_format_pattern = re.compile(r'(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d
                                 r'(?P<message>.*)')
 
 
-def parse_log_line(line: str, log_pattern: Pattern[str] = log_format_pattern) -> dict:
+def parse_log_line(line: str, log_pattern: Pattern[str] = log_format_pattern) -> Dict[str, str]:
     """
     Parses a log line and returns a dictionary with the timestamp, level, and message
     :arg line: log line to parse
@@ -23,7 +24,7 @@ def parse_log_line(line: str, log_pattern: Pattern[str] = log_format_pattern) ->
     return {}
 
 
-def load_logs(logfile_path: str) -> list:
+def load_logs(logfile_path: str) -> List[Dict[str, str]]:
     """
     Loads log lines from a file, parses them, and returns a list of log dictionaries
     :arg logfile_path: path to the log file
@@ -38,7 +39,7 @@ def load_logs(logfile_path: str) -> list:
         return [parse_log_line(line) for line in file]
 
 
-def filter_logs_by_level(logs: list, log_level: str) -> list:
+def filter_logs_by_level(logs: List[Dict[str, str]], log_level: str) -> List[Dict[str, str]]:
     """
     Filters log lines by the specified log level
     :arg logs: list of log dictionaries with the timestamp, level, and message
@@ -49,8 +50,17 @@ def filter_logs_by_level(logs: list, log_level: str) -> list:
     return [log for log in logs if log['level'] == log_level]
 
 
-def count_logs_by_level(logs: list) -> dict:
-    ...
+def count_logs_by_level(logs: List[Dict[str, str]]) -> Dict[str, int]:
+    """
+    Counts the number of log lines for each log level
+    :arg logs: list of log dictionaries with the timestamp, level, and message
+    :return: dictionary with the log level as key and the count of log lines as value
+    """
+
+    counts = defaultdict(int)
+    for log in logs:
+        counts[log['level']] += 1
+    return counts
 
 
 def display_log_counts(counts: dict):
