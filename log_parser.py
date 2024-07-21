@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from datetime import datetime
 from typing import List, Dict, Pattern
 from pathlib import Path
 
@@ -20,7 +21,9 @@ def parse_log_line(line: str, log_pattern: Pattern[str] = log_format_pattern) ->
 
     match = log_pattern.match(line)
     if match:
-        return match.groupdict()
+        log = match.groupdict()
+        log['timestamp'] = datetime.strptime(log['timestamp'], '%Y-%m-%d %H:%M:%S')
+        return log
     return {}
 
 
