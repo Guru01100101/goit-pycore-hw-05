@@ -1,4 +1,5 @@
 import json
+from functools import wraps
 from pathlib import Path
 from typing import List, Dict
 
@@ -137,6 +138,29 @@ def show_phonebook(phonebook: List[Dict[str, str]], sorted_=True) -> None:
         print(f"{contact['name']}: {contact['phone']}")
 
 
+def input_error(func):
+    """
+    Decorator to handle input errors in the bot. Handles the input error and prints the error message.
+    :errors:
+        - KeyError:
+        - ValueError:
+        - IndexError:
+    :return: str
+        The error message
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError as e:
+            return str(e)
+        except ValueError as e:
+            return str(e)
+        except IndexError as e:
+            return "Invalid command.\nAvailable commands:\nhello, add, change, delete, search, show, close, exit"
+    return wrapper
+
+
 def main(phonebook=None):
     print("Welcome to the assistant bot!")
 
@@ -153,37 +177,37 @@ def main(phonebook=None):
         elif command[0] == "hello":
             print("How can I help you?")
         elif command[0] == "add":
-            if len(command) != 3:
-                print("Invalid command.")
-                print("Usage: add <name> <phone>")
-                continue
+            # if len(command) != 3:
+            #     print("Invalid command.")
+            #     print("Usage: add <name> <phone>")
+            #     continue
             add_contact(command[1], command[2], phonebook)
         elif command[0] == "change":
-            if len(command) != 3:
-                print("Invalid command.")
-                print("Usage: change <name> <phone>")
-                continue
+            # if len(command) != 3:
+            #     print("Invalid command.")
+            #     print("Usage: change <name> <phone>")
+            #     continue
             change_contact(command[1], command[2], phonebook)
         elif command[0] == "delete":
-            if len(command) != 2:
-                print("Invalid command.")
-                print("Usage: delete <name>")
-                continue
+            # if len(command) != 2:
+            #     print("Invalid command.")
+            #     print("Usage: delete <name>")
+            #     continue
             delete_contact(command[1], phonebook)
         elif command[0] == "search":
-            if len(command) != 2:
-                print("Invalid command.")
-                print("Usage: search <pattern>")
-                continue
+            # if len(command) != 2:
+            #     print("Invalid command.")
+            #     print("Usage: search <pattern>")
+            #     continue
             search_contact(command[1], phonebook)
         elif command[0] in ["show", "all"]:
             if len(command) == 1 or (len(command) == 2 and command[1] == "all"):
                 show_phonebook(phonebook)
             elif len(command) == 2:
                 search_contact(command[1], phonebook)
-            else:
-                print("Invalid command.")
-                print("Usage: show [pattern]")
+            # else:
+            #     print("Invalid command.")
+            #     print("Usage: show [pattern]")
         else:
             print("Invalid command.")
             print("Available commands: hello, add, change, delete, search, show, close, exit")
