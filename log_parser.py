@@ -88,6 +88,7 @@ def main(logfile_path: str, log_level: str = None):
         display_log_counts(count_logs_by_level(logs))
         if log_level:
             filtered_logs = filter_logs_by_level(logs, log_level)
+            print(f"\nLog lines with level '{log_level}':")
             for log in filtered_logs:
                 print(f"{log['timestamp']} | {log['level']} | {log['message']}")
 
