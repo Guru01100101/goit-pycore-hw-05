@@ -39,7 +39,14 @@ def load_logs(logfile_path: str) -> list:
 
 
 def filter_logs_by_level(logs: list, log_level: str) -> list:
-    ...
+    """
+    Filters log lines by the specified log level
+    :arg logs: list of log dictionaries with the timestamp, level, and message
+    :arg log_level: log level to filter by
+    :return: list of log dictionaries with the specified log level
+    """
+
+    return [log for log in logs if log['level'] == log_level]
 
 
 def count_logs_by_level(logs: list) -> dict:
