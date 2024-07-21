@@ -90,7 +90,7 @@ def main(logfile_path: str, log_level: str = None):
             filtered_logs = filter_logs_by_level(logs, log_level)
             print(f"\nLog lines with level '{log_level}':")
             for log in filtered_logs:
-                print(f"{log['timestamp']} | {log['level']} | {log['message']}")
+                print(f"{log['timestamp']} - {log['message']}")
 
 
 if __name__ == '__main__':
