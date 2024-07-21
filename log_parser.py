@@ -67,4 +67,21 @@ def count_logs_by_level(logs: List[Dict[str, str]]) -> Dict[str, int]:
 
 
 def display_log_counts(counts: dict):
-    ...
+    """
+    Displays the log counts for each log level in readable format
+    :arg counts: dictionary with the log level as key and the count of log lines as value
+    :return: None (print the log counts to console)
+    """
+
+    print(f'{"Log level":<15} | {"Count":>10}')
+    print(f"{'|':{'-'}^33}")
+    for level, count in counts.items():
+        print(f"{level:<15} | {count:>10}")
+
+
+if __name__ == '__main__':
+    logs = load_logs('log.log')
+    if not logs:
+        print('Log file not found or empty')
+    else:
+        display_log_counts(count_logs_by_level(logs))
