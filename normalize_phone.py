@@ -15,7 +15,7 @@ def normalize_phone(phone_number: str) -> str:
     """
     phone_number = re.sub(r'\D', '', phone_number) # видалення всіх символів, що не є цифрами
     if len(phone_number) == 10 and phone_number.startswith("0"): # перевірка, чи введений номер телефону має 10 цифр та починається з '0'
-        return f"+380{phone_number}"
+        return f"+38{phone_number}"
     elif len(phone_number) == 12 and phone_number.startswith("38"): # перевірка, чи введений номер телефону має 12 цифр та починається з '38'
         return f"+{phone_number}"
     else:

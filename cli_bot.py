@@ -40,6 +40,30 @@ def save_phonebook(phonebook: List[Dict[str, str]], filename=PHONEBOOK_FILE) -> 
         json.dump(phonebook, file, indent=4)
 
 
+def input_error(func):
+    """
+    Decorator to handle input errors in the bot. Handles the input error and prints the error message.
+    :errors:
+        - KeyError:
+        - ValueError:
+        - IndexError:
+    :return: str
+        The error message
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError as e:
+            return str(e)
+        except ValueError as e:
+            print(e)
+        except IndexError as e:
+            return "Invalid command.\nAvailable commands:\nhello, add, change, delete, search, show, close, exit"
+    return wrapper
+
+
+@input_error
 def add_contact(name: str, phone: str, phonebook: List[Dict[str, str]]) -> None:
     """Function to add a contact to the phonebook.
 
@@ -59,6 +83,7 @@ def add_contact(name: str, phone: str, phonebook: List[Dict[str, str]]) -> None:
     print(f"Contact {name} added.")
 
 
+@input_error
 def change_contact(name: str, new_phone: str, phonebook: List[Dict[str, str]]) -> None:
     """Function to change the phone number of a contact.
 
@@ -72,14 +97,18 @@ def change_contact(name: str, new_phone: str, phonebook: List[Dict[str, str]]) -
     __return__:
         None
     """
+    if not any(contact["name"].lower() == name.lower() for contact in phonebook):
+        raise ValueError(f"Contact {name} not found.")
+
     new_phone = normalize_phone(new_phone)
     for contact in phonebook:
-        if contact["name"] == name:
+        if contact["name"].lower() == name.lower():
             contact["phone"] = new_phone
             break
     print(f"Contact {name} updated.\nNew phone: {new_phone}")
 
 
+@input_error
 def delete_contact(name: str, phonebook: List[Dict[str, str]]) -> None:
     """Function to delete a contact from the phonebook.
 
@@ -91,13 +120,13 @@ def delete_contact(name: str, phonebook: List[Dict[str, str]]) -> None:
     __return__:
         None
     """
+    if not any(contact["name"].lower() == name.lower() for contact in phonebook):
+        raise ValueError(f"Contact {name} not found.")
     for contact in phonebook:
-        if contact["name"] == name:
+        if contact["name"].lower() == name.lower():
             phonebook.remove(contact)
             print(f"Contact {name} deleted.")
             break
-        else:
-            print("Contact not found.")
 
 
 def search_contact(pattern: str, phonebook: List[Dict[str, str]]) -> None:
@@ -115,12 +144,12 @@ def search_contact(pattern: str, phonebook: List[Dict[str, str]]) -> None:
     found = False
 
     for contact in phonebook:
-        if pattern.lower() in contact["name"].lower():
+        if pattern.lower() in contact["name"].lower() or pattern in contact["phone"]:
             print(f"{contact['name']}: {contact['phone']}")
             found = True
 
     if not found:
-        print("Contact not found.")
+        raise ValueError(f"Contact {pattern} not found.")
 
 
 def show_phonebook(phonebook: List[Dict[str, str]], sorted_=True) -> None:
@@ -136,29 +165,6 @@ def show_phonebook(phonebook: List[Dict[str, str]], sorted_=True) -> None:
         phonebook = sorted(phonebook, key=lambda contact: contact["name"])
     for contact in phonebook:
         print(f"{contact['name']}: {contact['phone']}")
-
-
-def input_error(func):
-    """
-    Decorator to handle input errors in the bot. Handles the input error and prints the error message.
-    :errors:
-        - KeyError:
-        - ValueError:
-        - IndexError:
-    :return: str
-        The error message
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except KeyError as e:
-            return str(e)
-        except ValueError as e:
-            return str(e)
-        except IndexError as e:
-            return "Invalid command.\nAvailable commands:\nhello, add, change, delete, search, show, close, exit"
-    return wrapper
 
 
 def main(phonebook=None):
@@ -177,37 +183,37 @@ def main(phonebook=None):
         elif command[0] == "hello":
             print("How can I help you?")
         elif command[0] == "add":
-            # if len(command) != 3:
-            #     print("Invalid command.")
-            #     print("Usage: add <name> <phone>")
-            #     continue
+            if len(command) != 3:
+                print("Invalid command.")
+                print("Usage: add <name> <phone>")
+                continue
             add_contact(command[1], command[2], phonebook)
         elif command[0] == "change":
-            # if len(command) != 3:
-            #     print("Invalid command.")
-            #     print("Usage: change <name> <phone>")
-            #     continue
+            if len(command) != 3:
+                print("Invalid command.")
+                print("Usage: change <name> <phone>")
+                continue
             change_contact(command[1], command[2], phonebook)
         elif command[0] == "delete":
-            # if len(command) != 2:
-            #     print("Invalid command.")
-            #     print("Usage: delete <name>")
-            #     continue
+            if len(command) != 2:
+                print("Invalid command.")
+                print("Usage: delete <name>")
+                continue
             delete_contact(command[1], phonebook)
         elif command[0] == "search":
-            # if len(command) != 2:
-            #     print("Invalid command.")
-            #     print("Usage: search <pattern>")
-            #     continue
+            if len(command) != 2:
+                print("Invalid command.")
+                print("Usage: search <pattern>")
+                continue
             search_contact(command[1], phonebook)
         elif command[0] in ["show", "all"]:
             if len(command) == 1 or (len(command) == 2 and command[1] == "all"):
                 show_phonebook(phonebook)
             elif len(command) == 2:
                 search_contact(command[1], phonebook)
-            # else:
-            #     print("Invalid command.")
-            #     print("Usage: show [pattern]")
+            else:
+                print("Invalid command.")
+                print("Usage: show [pattern]")
         else:
             print("Invalid command.")
             print("Available commands: hello, add, change, delete, search, show, close, exit")
